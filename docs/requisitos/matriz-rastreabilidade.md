@@ -42,7 +42,7 @@ Diagramas em `docs/uml/` (exportações em `diagrams/`).
 | **RNF04** Disponibilidade | Fila durável, *timeout*, *circuit breaker*, cache de cotação com validade | `ProcessadorOrdens`, `CorretoraResiliente`, `CotacaoService` | `ProcessadorOrdensTest`, `CorretoraResilienteTest`, demo §10–11 |
 | **RNF05** Desempenho | Validação externa fora da transação; índices | `OrdemService`, `schema.sql` | `desempenho.txt` |
 | **RNF06** Confiabilidade | Chave de idempotência; `id_execucao` único; `idCliente` | `OrdemService`, `Execucoes`, `CorretoraSimulada` | `OrdemServiceTest`, `ProcessadorOrdensTest`, demo §4 |
-| **RNF07** Manutenibilidade | Arquitetura hexagonal; docs e SQL versionados | Estrutura de pastas | `README.md`, `resultado-testes.txt` |
+| **RNF07** Manutenibilidade | Arquitetura hexagonal; docs e SQL versionados | Estrutura de pastas | `README.md`, `docs/evidencias/resultado-testes-maven-postgresql-2026-11-26.txt` |
 | **RNF08** Privacidade | Identidade derivada da sessão; "não encontrado" para ordem alheia | `OrdemService`, `CarteiraService` | `PrivacidadeEAcessoTest`, demo §13 |
 | **RNF09** Escalabilidade | Fila + workers idempotentes; `versao` otimista | `FilaOrdens`, `RepositoriosJdbc` | Diagrama de componentes |
 | **RNF10** Recuperabilidade | *Outbox*; reentrega de relatórios; consumidor idempotente | `ProcessadorOrdens` | `ProcessadorOrdensTest.reenvioParaACorretora…` |
@@ -60,6 +60,6 @@ Ver a coluna **Req.** e **Teste** em [`regras-de-negocio.md`](regras-de-negocio.
 | RF05 — Enviar ordem de compra | Enviar ordem de compra | Atividade, sequência e estados ✔ | Validação de saldo, limite e idempotência ✔ |
 | RF06 — Enviar ordem de venda | Enviar ordem de venda | Atividade, sequência e estados ✔ | Validação de posição disponível ✔ |
 | RF08 — Validar ordem | Validar ordem | Atividade e sequência ✔ | Serviço de risco e regras de negócio (`ValidadorOrdem`) ✔ |
-| RF10 — Auditar eventos | Registrar auditoria | Classes e componentes ✔ *(implantação: fora do escopo desta fase)* | Log persistente e trilha de auditoria ✔ |
+| RF10 — Auditar eventos | Registrar auditoria | Classes e componentes ✔ | Auditoria persistente com hash encadeado e proteção contra alteração/remoção ✔ |
 | RNF01 — Segurança | Autenticar usuário | Casos de uso e componentes ✔ | MFA, hash, controle de acesso ✔ |
 | RNF06 — Confiabilidade | Transmitir ordem | Sequência e estados ✔ | Chave de idempotência e tratamento de falha ✔ |

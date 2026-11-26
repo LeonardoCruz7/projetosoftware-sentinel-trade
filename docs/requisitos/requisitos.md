@@ -31,8 +31,8 @@ externos que se integram (Corretora/Bolsa, Provedor de Cotações, Serviços de 
 ## 3. Requisitos funcionais
 
 Cada critério de aceitação é verificável; a coluna **Verificação** aponta o teste automatizado ou a evidência.
-A numeração **RF01–RF12 segue o enunciado**; RF13–RF23 foram acrescentados pela equipe para cobrir o que o próprio
-enunciado exige (cadastro de investidores, histórico, limites, transmissão assíncrona, **alteração de ordem**, interface etc.).
+A numeração **RF01–RF12 segue o enunciado**; acrescentamos RF13–RF23 para cobrir outros pontos exigidos no próprio
+enunciado (cadastro de investidores, histórico, limites, transmissão assíncrona, **alteração de ordem**, interface etc.).
 
 | ID | Requisito | Critério de aceitação | Prior. | Verificação |
 |---|---|---|---|---|
@@ -70,9 +70,9 @@ enunciado exige (cadastro de investidores, histórico, limites, transmissão ass
 | **RNF02** | Integridade | Toda ordem tem investidor, ativo, lado, quantidade > 0 e preço > 0 válidos; saldo e quantidades nunca ficam negativos (no código **e** no banco por `CHECK`). | Invariantes em `Ordem`/`Conta`/`Posicao`; `CHECK` em `schema.sql` | `OrdemTest`, `validacao-sql.txt` |
 | **RNF03** | Auditabilidade | 100% das mudanças de estado e ações sensíveis geram evento; a trilha é *append-only*, com hash encadeado SHA-256; qualquer alteração/remoção/reordenação é detectada; no PostgreSQL, `UPDATE/DELETE/TRUNCATE` são bloqueados por gatilho e privilégio. | `AuditoriaService`, `hardening-postgres.sql` | `AuditoriaServiceTest` |
 | **RNF04** | Disponibilidade | Falha da corretora **não** corrompe ordens/posições: a ordem continua na fila e, se esgotar as tentativas, é rejeitada com devolução integral da reserva. Falha do provedor de cotações: usa a última cotação válida recente; se antiga, **bloqueia** novas ordens (nunca negocia com preço velho). | Fila durável, `CorretoraResiliente`, `CotacaoService` | `ProcessadorOrdensTest`, `OrdemServiceTest`, `CotacaoServiceTest` |
-| **RNF05** | Desempenho | Em ambiente simulado (em memória), consulta de carteira e de cotações com p95 < 5 ms e envio de ordem (validação + reserva + auditoria) com p95 < 50 ms, excluindo a latência do banco e da corretora. **Medido:** carteira p95 0,03 ms; cotações p95 0,01 ms; envio de ordem p95 0,79 ms (n = 2.000). | Validação de mercado fora da transação; consultas indexadas | `docs/evidencias/desempenho.txt` |
+| **RNF05** | Desempenho | Em ambiente simulado (em memória), consulta de carteira e de cotações com p95 < 5 ms e envio de ordem (validação + reserva + auditoria) com p95 < 50 ms, excluindo a latência do banco e da corretora. **Resultado do ensaio registrado:** carteira p95 0,03 ms; cotações p95 0,01 ms; envio de ordem p95 0,79 ms (n = 2.000). O ensaio foi feito em memória, sem latência de banco ou rede. | Validação de mercado fora da transação; consultas indexadas | `docs/evidencias/desempenho.txt` |
 | **RNF06** | Confiabilidade | Reenvios e falhas de comunicação não duplicam ordens: mesma chave de idempotência → mesma ordem; execução repetida → aplicada uma única vez; reenvio à corretora → ela mantém uma única ordem. | `UNIQUE(investidor_id, chave_idempotencia)`, `PK id_execucao`, `idCliente` na corretora | `OrdemServiceTest`, `ProcessadorOrdensTest` |
-| **RNF07** | Manutenibilidade | Código em camadas (interface / aplicação / portas / infraestrutura) sem dependência de framework no núcleo; documentação, SQL e diagramas versionados; suíte de testes das regras críticas. | Arquitetura hexagonal; ver `README.md` | 167 testes + 2 de integração com PostgreSQL (`resultado-testes.txt`) |
+| **RNF07** | Manutenibilidade | Código em camadas (interface / aplicação / portas / infraestrutura) sem dependência de framework no núcleo; documentação, SQL e diagramas versionados; suíte de testes das regras críticas. | Arquitetura hexagonal; ver `README.md` | 169 testes executados (incluindo 2 de integração com PostgreSQL; execução de 26/11/2026 em `resultado-testes-maven-postgresql-2026-11-26.txt`) |
 | **RNF08** | Privacidade | Um investidor só acessa os próprios dados: o investidor vem **da sessão**, nunca de parâmetro; ordem de terceiros é indistinguível de inexistente. | `OrdemService.doInvestidor`, `CarteiraService` | `PrivacidadeEAcessoTest` |
 | **RNF09** | Escalabilidade | Serviços sem estado de sessão em memória (sessão no banco); transmissão desacoplada por fila (workers adicionáveis, pois o reenvio é idempotente); concorrência otimista por coluna `versao`. | Fila durável; `UPDATE … WHERE versao = ?` | Revisão de projeto; limite documentado em §6 |
 | **RNF10** | Recuperabilidade | Após queda em qualquer ponto, nenhuma ordem é perdida nem duplicada: o estado vive no banco; mensagens não concluídas são reprocessadas; relatórios não confirmados são reentregues. | Padrão *outbox*; entrega "pelo menos uma vez" + consumidor idempotente | `ProcessadorOrdensTest.reenvioParaACorretora…` |
@@ -96,7 +96,7 @@ enunciado exige (cadastro de investidores, histórico, limites, transmissão ass
 | RNF-01 / RNF-10 MFA e proteção de senhas | RNF01 | |
 | RNF-02 Recuperação, indisponibilidade controlada, duplicidade | RNF04, RNF06, RNF10 | Separado em três critérios mensuráveis. |
 | RNF-03 Integridade | RNF02 | |
-| RNF-04 Desempenho | RNF05 | Agora com números medidos. |
+| RNF-04 Desempenho | RNF05 | Critérios numéricos e resultados do ensaio registrados em `desempenho.txt`. |
 | RNF-05 Escalabilidade | RNF09 | |
 | RNF-06 Segurança de dados | RNF01, RNF08 | |
 | RNF-07 Recuperação de falhas | RNF10 | |
@@ -112,5 +112,5 @@ enunciado exige (cadastro de investidores, histórico, limites, transmissão ass
 - **Sem fracionamento de risco por ativo:** os limites são por ordem e por dia (em valor), não por ativo.
 - **Trilha única:** a cadeia de auditoria é global (serializa gravações); em alto volume, particionar por entidade é a evolução natural.
 - **Um worker por vez** é o cenário testado; vários workers são seguros pela idempotência, mas a fila padrão não usa `SKIP LOCKED`.
-- **Persistência verificada em duas etapas:** os 45 comandos SQL do JDBC foram validados contra o esquema e há um teste de integração (`PostgresIntegracaoTest`) que roda a camada JDBC contra um PostgreSQL real, inclusive com concorrência. Ele só executa quando `SENTINEL_IT_DB_URL` está definida; a execução e a saída anexada pertencem ao roteiro do `README.md`.
+- **Persistência verificada em duas etapas:** validamos os 45 comandos SQL do JDBC contra o esquema e executamos `PostgresIntegracaoTest` contra um PostgreSQL real, inclusive com concorrência. Os testes de integração dependem de `SENTINEL_IT_DB_URL`; em 26/11/2026, executamos os dois testes e registramos o resultado em `docs/evidencias/resultado-testes-maven-postgresql-2026-11-26.txt`.
 - **Interface web simples:** HTTP sem TLS (escuta só em 127.0.0.1 por padrão). Em produção, colocar atrás de um proxy reverso com TLS.

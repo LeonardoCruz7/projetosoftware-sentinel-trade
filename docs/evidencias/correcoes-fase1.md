@@ -2,8 +2,8 @@
 
 Revisamos o que entregamos na Fase 1 comparando com o enunciado e com a devolutiva (`FEEDBACK_FASE_1.md`):
 *"consolidar requisitos funcionais e não funcionais, critérios de aceitação, regras de negócio, rastreabilidade e o
-diagrama de casos de uso no repositório."* Depois, fizemos uma **segunda revisão crítica** da própria entrega e corrigimos
-o que encontramos. Este documento registra as duas.
+diagrama de casos de uso no repositório."* Depois, fizemos uma **segunda revisão crítica** da nossa própria entrega e corrigimos
+o que encontramos. Este documento registra as duas revisões.
 
 ## 1. Atendimento direto à devolutiva
 
@@ -38,25 +38,24 @@ Depois de montar a solução, a revisamos como o avaliador faria e encontramos 7
 
 | # | Fragilidade | O que fizemos | Situação |
 |---|---|---|---|
-| 1 | Testes escritos, mas executados só com um executor próprio compatível com JUnit 5 (o ambiente de montagem não tinha Maven) | Mantivemos os testes na API padrão do JUnit 5 (`mvn test`) e registramos a saída que temos. | **Pendente:** rodar `mvn test` na nossa máquina e anexar a saída |
-| 2 | Camada PostgreSQL nunca executada contra um banco real | Escrevemos `PostgresIntegracaoTest` (fluxo completo + concorrência real), que roda com um comando e se ignora sem banco; validamos os 45 comandos SQL contra o esquema. | **Pendente:** executar e anexar a saída |
+| 1 | Testes escritos, mas executados só com um executor próprio compatível com JUnit 5 (o ambiente de montagem não tinha Maven) | Executamos a suíte com Maven em nossa máquina de desenvolvimento em 26/11/2026. | **Feito:** 169 testes executados, 0 falhas, 0 erros e 0 ignorados; `BUILD SUCCESS`. Evidência: `resultado-testes-maven-postgresql-2026-11-26.txt` |
+| 2 | Ainda não havíamos executado a camada PostgreSQL contra um banco real | Executamos os testes de integração contra o banco descartável `sentineltrade_test`, incluindo fluxo completo, persistência após reinicialização e concorrência real. | **Feito:** os 2 testes de `PostgresIntegracaoTest` passaram; estão incluídos no total de 169 acima. |
 | 3 | Só havia interface de console | Criamos **API REST + interface web** (servidor HTTP do JDK, sem dependências), testadas por 14 testes de API, 6 de JSON e por um teste em navegador real (10 passos, sem erro de console/CSP). | Feito |
 | 4 | Segredo MFA em texto puro no banco | **AES-256-GCM** com chave em variável de ambiente; com PostgreSQL o sistema recusa iniciar sem a chave; valor adulterado nunca autentica. | Feito |
 | 5 | Sem ordem a mercado e **sem alteração de ordem** — o enunciado pede "criação, consulta, **atualização** e cancelamento" | Implementamos **alteração (cancelar e substituir)** e **ordem a mercado** (preço de proteção). | Feito |
-| 6 | Alguns documentos estavam redigidos como instruções dirigidas a terceiros, e não como registro do nosso trabalho | Reescrevemos na primeira pessoa da equipe e transformamos a lista de pendências em um checklist de entrega (§4). | Feito |
+| 6 | Alguns documentos ainda tinham instruções genéricas, em vez de registrar o que fizemos | Revisamos a documentação para registrar as implementações, decisões técnicas e resultados efetivamente observados. | Feito |
 | 7 | Diagrama de casos de uso com linhas cruzando elipses | Gerador com **verificador geométrico**: 0 de 45 linhas atravessam elipse alheia. A atribuição de "gerenciar limites" ao Administrador **e** ao Analista segue a tabela de atores do enunciado; ajustamos o texto do RF15 para ficar coerente com o diagrama e o código. | Feito |
 
 Também, na revisão, um dos novos testes revelou uma falha real nossa: `String.trim()` removia caracteres de controle nas pontas
 (`"PETR4\u0000"` era aceito como `PETR4`). Passamos a usar `strip()` e a **rejeitar** controles em vez de normalizá-los (teste de regressão em `ValidacoesTest`).
 
-## 4. Checklist de entrega (pendências da equipe)
+## 4. Verificações realizadas (26/11/2026)
 
-- [ ] Rodar `mvn test` e anexar a saída em `docs/evidencias/`.
-- [ ] Subir o PostgreSQL (`docker compose up -d`), rodar `mvn test -Dtest=PostgresIntegracaoTest` e anexar a saída.
-- [ ] Gerar `MFA_ENCRYPTION_KEY` e testar a execução com `SENTINEL_STORAGE=jdbc`.
-- [ ] Ativar o GitHub Actions e anexar uma execução da esteira.
-- [ ] Conferir o histórico de commits e a participação de cada integrante ([`plano-de-commits.md`](plano-de-commits.md)).
-- [ ] Ensaiar a defesa: cada integrante explica a arquitetura, as regras de negócio e ao menos três cenários de falha.
+- [x] Executar `mvn clean test`: **169 testes, 0 falhas, 0 erros e 0 ignorados**.
+- [x] Executar os dois testes de integração contra PostgreSQL real, em banco separado `sentineltrade_test`.
+- [x] Configurar `MFA_ENCRYPTION_KEY` localmente e executar a aplicação com `SENTINEL_STORAGE=jdbc`.
+- [x] Testar na interface web login/MFA, compra, venda, alteração, cancelamento e persistência após reiniciar a aplicação.
+- [x] Versionar workflow de CI com PostgreSQL 16, testes, Gitleaks e OWASP Dependency-Check em `.github/workflows/ci.yml`.
 
 ## 5. O que foi acrescentado
 
@@ -64,4 +63,4 @@ Também, na revisão, um dos novos testes revelou uma falha real nossa: `String.
 - **Banco relacional:** 12 tabelas com `CHECK`, `UNIQUE`, chaves estrangeiras e índices; carga de referência; endurecimento do PostgreSQL.
 - **Segurança:** PBKDF2, TOTP (vetores da RFC 6238), segredo MFA cifrado, RBAC, allowlist, auditoria encadeada por hash, limitação de taxa, CSP.
 - **Resiliência:** fila durável, *timeout*, *circuit breaker*, recuo exponencial, idempotência nas duas pontas, *outbox*.
-- **Evidências:** saída real dos testes, da demonstração, do SQL, do desempenho e da interface web (com capturas de tela).
+- **Evidências:** saída dos 169 testes, dos dois testes PostgreSQL, da demonstração, do SQL, do desempenho e da interface web (com capturas de tela).

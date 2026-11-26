@@ -55,7 +55,7 @@ public final class Main {
     }
 
     private static void executarWeb(Aplicacao app, Config cfg, List<Credencial> credenciais) throws IOException {
-        ServidorWeb web = new ServidorWeb(app, !credenciais.isEmpty());
+        ServidorWeb web = new ServidorWeb(app, cfg.demo() || !credenciais.isEmpty());
         int porta = web.iniciar(cfg.webEndereco(), cfg.webPorta());
         System.out.println("SentinelTrade (SIMULADO) — interface web em http://" + cfg.webEndereco() + ":" + porta + "/");
         if (!credenciais.isEmpty()) {

@@ -1,6 +1,6 @@
-# Análise: a equipe está seguindo o pensamento sistêmico?
+# Nossa análise do pensamento sistêmico
 
-O enunciado pede essa avaliação. Para nós, pensamento sistêmico significa: olhar o **todo** e as **relações** entre as
+O enunciado pede esta avaliação. Em nossa análise, pensamento sistêmico significa: olhar o **todo** e as **relações** entre as
 partes (não cada módulo isolado); prever **como uma falha se propaga**; identificar **ciclos de realimentação**; e aceitar
 **trade-offs** conscientes. Avaliamos com honestidade o que entregamos na Fase 1 (README, lista de requisitos e diagrama de casos de
 uso) e o que mudou nesta versão.
@@ -9,7 +9,7 @@ uso) e o que mudou nesta versão.
 
 | Critério | Evidência na Fase 1 | Avaliação |
 |---|---|---|
-| **Visão do todo** | O README tinha a seção "Pensamento Sistêmico" e um esboço de arquitetura com 7 componentes (Frontend, Backend, Autenticação, Motor de Ordens, Banco, Corretora, Provedor). | ✅ **Presente na intenção.** Percebemos que o sistema é um conjunto de partes interdependentes. |
+| **Visão do todo** | Na Fase 1, nosso README tinha a seção "Pensamento Sistêmico" e um esboço de arquitetura com 7 componentes (Frontend, Backend, Autenticação, Motor de Ordens, Banco, Corretora, Provedor). | ✅ **Presente na intenção.** Percebemos que o sistema é um conjunto de partes interdependentes. |
 | **Falhas que se propagam** | O texto afirma que "uma falha em um componente pode afetar os demais" e lista *timeout*, retentativa, idempotência e fila. | 🟡 **Declarado, não demonstrado.** Nenhum requisito, regra ou diagrama dizia *o que acontece* quando a corretora cai no meio de uma ordem. |
 | **Fronteira do sistema e atores** | O diagrama de casos de uso tinha só 3 dos 7 atores (sem Administrador, Analista de Risco, Notificação, Auditoria). | 🔴 **Lacuna.** Ator ausente = fronteira mal desenhada: ninguém "dono" do risco, da auditoria ou dos parâmetros. |
 | **Relações entre casos de uso** | «include» invertido: *Transmitir ordem* incluía *Acompanhar ciclo de vida*; Notificação ligada ao Investidor. | 🔴 **Causalidade confundida.** O ciclo de vida é *consequência* da execução, não parte da transmissão. |
@@ -60,7 +60,7 @@ faltava transformar a intuição em análise de interdependências, modos de fal
 | Validação de mercado **fora** da transação | Não segura conexão de banco esperando sistema externo | A cotação pode mudar entre validar e gravar (mitigado pela faixa de preço e pelo preço de execução vir da corretora). |
 | Mensagem de login **única** | Impede enumeração de usuários | Menos informativa para quem erra o e-mail. |
 | Entrega "pelo menos uma vez" + consumidor idempotente | Nunca perde execução | Exige idempotência em todo consumidor (custo de projeto). |
-| PBKDF2 com 600.000 iterações | Resiste a força bruta offline | Login leva ~160 ms (medido) — é o preço desejado. |
+| PBKDF2 com 600.000 iterações | Resiste a força bruta offline | Login levou 224 ms no ensaio registrado — é o custo de desempenho que aceitamos para esse nível de proteção. |
 | Atomicidade real só no JDBC | Regras testáveis sem banco | O adaptador em memória **não desfaz** alterações em caso de erro (documentado). |
 
 ### 2.4 Pontos de alavanca (onde pequenas escolhas protegem o todo)
@@ -79,8 +79,6 @@ faltava transformar a intuição em análise de interdependências, modos de fal
 | Ciclos de realimentação | 🔴 | ✅ §2.2 |
 | Fronteira e atores | 🔴 | ✅ 7 atores, 25 casos de uso |
 | Trade-offs explícitos | 🔴 | ✅ §2.3 |
-| Verificável | 🔴 | ✅ 167 testes + roteiro de demonstração + teste de interface em navegador |
+| Verificável | 🔴 | ✅ 169 testes (incluindo PostgreSQL) + roteiro de demonstração + teste de interface em navegador |
 
-**Já pensávamos de forma sistêmica; o que faltava era registrar e provar.** Por isso cada linha da tabela §2.1 aponta
-para o teste que a prova. Combinamos que cada integrante deve ser capaz de explicar, de ponta a ponta (da falha ao teste),
-pelo menos três dessas linhas na defesa.
+**Já considerávamos o sistema como um conjunto de partes interdependentes; nesta versão, transformamos essa visão em análise e evidências.** Cada linha da tabela §2.1 aponta para o teste correspondente. Para a defesa, organizamos a apresentação de modo que nós dois consigamos explicar, de ponta a ponta, pelo menos três cenários (da falha ao teste).

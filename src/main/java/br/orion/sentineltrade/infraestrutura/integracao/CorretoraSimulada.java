@@ -26,6 +26,7 @@ public final class CorretoraSimulada implements CorretoraGateway {
     private final Map<UUID, OrdemCorretora> livro = new LinkedHashMap<>();
     private final Map<UUID, AckCorretora> acks = new HashMap<>();
     private final Map<String, RelatorioExecucao> naoConfirmados = new LinkedHashMap<>();
+    private final String prefixoExecucao = UUID.randomUUID().toString();
     private int sequencia;
 
     private volatile boolean indisponivel;
@@ -86,7 +87,7 @@ public final class CorretoraSimulada implements CorretoraGateway {
             if (!cruza) continue;                                         // ordem "repousa" no livro
             int q = Math.min(oc.ordem.quantidade() - oc.executado, loteMaximo);
             oc.executado += q;
-            String id = "EXE-" + (++sequencia);
+            String id = prefixoExecucao + "-EXE-" + (++sequencia);
             naoConfirmados.put(id, new RelatorioExecucao(id, oc.ordem.idCliente(), RelatorioExecucao.Tipo.EXECUCAO, q, preco, null, clock.instant()));
         }
         List<RelatorioExecucao> saida = new ArrayList<>(naoConfirmados.values());

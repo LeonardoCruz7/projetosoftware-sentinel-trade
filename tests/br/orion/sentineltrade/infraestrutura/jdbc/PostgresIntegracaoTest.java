@@ -126,8 +126,11 @@ class PostgresIntegracaoTest {
             }
             return null;
         }));
-        for (Future<?> f : fs) f.get(60, TimeUnit.SECONDS);
-        pool.shutdown();
+        try {
+            for (Future<?> f : fs) f.get(60, TimeUnit.SECONDS);
+        } finally {
+            pool.shutdownNow();
+        }
 
         assertEquals(20, app.ordens.historico(t).size(), "20 ordens distintas, nenhuma duplicada");
         assertEquals(Dinheiro.de("207.00"), app.carteira.consultarSaldo(t).bloqueado(), "reserva exata: sem gasto duplo");

@@ -1,6 +1,6 @@
 # Regras de negócio
 
-**RN01–RN08 vêm do enunciado**; RN09–RN32 são decisões da equipe que detalham as validações exigidas (saldo, posição,
+**RN01–RN08 vêm do enunciado**; definimos RN09–RN32 para detalhar as validações exigidas (saldo, posição,
 limite de risco, situação do mercado) e a resiliência. Cada regra tem **código estável** (`CodigoRegra`, quando gera
 rejeição), o ponto do código onde é aplicada e o teste que a verifica.
 

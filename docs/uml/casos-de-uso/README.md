@@ -6,9 +6,9 @@ Fonte editável: [`gerar_casos_de_uso.py`](gerar_casos_de_uso.py) produz [`casos
 
 ## O que mudou em relação à versão da Fase 1
 
-| Problema na versão anterior | Correção |
+| Problema que identificamos na versão anterior | Como corrigimos nesta versão |
 |---|---|
-| Só 3 dos 7 atores (faltavam Administrador, Analista de Risco, Serviço de Notificação, Serviço de Auditoria). | Os **7 atores** do enunciado. |
+| Na versão anterior, tínhamos apenas 3 dos 7 atores (faltavam Administrador, Analista de Risco, Serviço de Notificação e Serviço de Auditoria). | Incluímos os **7 atores** do enunciado. |
 | Sem MFA, sem "Consultar saldo", sem "Gerenciar ativos/limites". | Incluídos: **Autenticar-se com MFA**, Consultar saldo, Gerenciar ativos e parâmetros, Gerenciar limites de risco, Gerenciar investidores. |
 | "Enviar ordem" genérico. | **Enviar ordem de compra** e **de venda** separados (regras diferentes: saldo × posição). |
 | "Validar ordem" sem detalhar o que valida. | `Validar ordem` «include» **Verificar saldo ou posição**, **Verificar limites de risco** e **Verificar mercado e cotação**. |

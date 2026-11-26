@@ -281,6 +281,10 @@ public final class RepositoriosJdbc {
                     rs.getString("entidade"), rs.getString("entidade_id"), rs.getString("detalhes"),
                     rs.getString("hash_anterior").trim(), rs.getString("hash").trim());
         };
+        @Override public void bloquearAppend() {
+            // Lock transacional global: evita que duas transações calculem a mesma próxima sequência.
+            j.consultar("SELECT pg_advisory_xact_lock(7263145101::bigint)", rs -> 1);
+        }
         @Override public Optional<EventoAuditoria> ultimo() { return j.um(SQL_ULTIMO_EVENTO, MAP); }
         @Override public void anexar(EventoAuditoria e) {
             if (j.atualizar(SQL_ANEXAR_EVENTO, e.seq(), e.instante(), e.tipo(), e.usuarioId(), e.entidade(), e.entidadeId(),

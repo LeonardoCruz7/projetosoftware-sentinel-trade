@@ -26,9 +26,10 @@ public final class AuditoriaService {
     public AuditoriaService(AuditoriaRepositorio repo, Clock clock) { this.repo = repo; this.clock = clock; }
 
     /** Deve ser chamado DENTRO da transação do fato auditado: ambos confirmam ou desfazem juntos. */
-    public synchronized EventoAuditoria registrar(TipoEvento tipo, UUID usuarioId, String entidade, String entidadeId, String detalhes) {
+    public EventoAuditoria registrar(TipoEvento tipo, UUID usuarioId, String entidade, String entidadeId, String detalhes) {
         String det = Sanitizador.paraLog(detalhes, 500);
         for (int tentativa = 1; ; tentativa++) {
+            repo.bloquearAppend();                                               // dentro da transação: uma ponta por vez
             Instant agora = clock.instant().truncatedTo(ChronoUnit.MILLIS);  // precisão do banco: evita divergência de hash
             EventoAuditoria ultimo = repo.ultimo().orElse(null);
             long seq = ultimo == null ? 1 : ultimo.seq() + 1;

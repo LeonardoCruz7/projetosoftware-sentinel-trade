@@ -69,6 +69,8 @@ public final class Repositorios {
     }
 
     public interface AuditoriaRepositorio {
+        /** Serializa a leitura e a inserção da próxima sequência dentro da transação atual. */
+        default void bloquearAppend() {}
         Optional<EventoAuditoria> ultimo();
         void anexar(EventoAuditoria e);             // somente inserção; ConcorrenciaException se seq já existe
         List<EventoAuditoria> listar(long aposSeq, int limite);
