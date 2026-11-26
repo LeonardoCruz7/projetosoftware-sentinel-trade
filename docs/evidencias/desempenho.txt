@@ -1,0 +1,8 @@
+SentinelTrade — medição de desempenho (ambiente SIMULADO, dados em memória; não inclui latência de banco nem de rede)
+Contêiner Linux, JDK 21. Valores variam entre execuções; o objetivo é verificar a ordem de grandeza do RNF05.
+------------------------------------------------------------------------
+login completo (PBKDF2 600.000 it.): 224 ms
+consultarCarteira   p50=0.009 ms  p95=0.026 ms  p99=0.091 ms (n=2000)
+listar cotações     p50=0.007 ms  p95=0.011 ms  p99=0.038 ms
+enviarOrdem (valida+reserva+audita)  p50=0.094 ms  p95=0.794 ms  p99=8.312 ms
+auditoria íntegra após 1+ eventos: Verificacao[integra=true, seqProblema=0, motivo=Cadeia íntegra (6009 eventos)]
